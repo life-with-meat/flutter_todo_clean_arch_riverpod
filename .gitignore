@@ -50,6 +50,9 @@ android/app/google-services.json
 # Firebase config
 ios/Runner/GoogleService-Info.plist
 
+firebase.json
+firebase_options.dart
+
 # その他
 .env
 .metadata
