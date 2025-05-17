@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/value/todo_title.dart';
 
 part 'todo_model.freezed.dart';
 part 'todo_model.g.dart';
@@ -7,7 +8,7 @@ part 'todo_model.g.dart';
 abstract class TodoModel with _$TodoModel {
   factory TodoModel({
     required String id,
-    required String title,
+    required TodoTitle title,
     required bool isDone,
   }) = _TodoModel;
 
