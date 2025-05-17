@@ -23,7 +23,7 @@ class TodoPage extends ConsumerWidget {
                 final todo = todos[index];
                 return CheckboxListTile(
                   title: Text(
-                    todo.title,
+                    todo.title.value,
                     style: TextStyle(
                       decoration:
                           todo.isDone ? TextDecoration.lineThrough : null,
@@ -43,13 +43,11 @@ class TodoPage extends ConsumerWidget {
                           context: context,
                           builder: (BuildContext context) {
                             return TodoDialog(
-                              initialTitle: todo.title,
+                              initialTitle: todo.title.value,
                               dialogTitle: 'タスクを編集',
                               errorProvider: editErrorProvider,
                               onSave: (newTitle) {
-                                todoPageController.update(
-                                  todo.copyWith(title: newTitle),
-                                );
+                                todoPageController.update(todo.id, newTitle);
                               },
                             );
                           },
