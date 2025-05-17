@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TodoModel {
 
- String get id; String get title; bool get isDone;
+ String get id; TodoTitle get title; bool get isDone;
 /// Create a copy of TodoModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $TodoModelCopyWith<$Res>  {
   factory $TodoModelCopyWith(TodoModel value, $Res Function(TodoModel) _then) = _$TodoModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, bool isDone
+ String id, TodoTitle title, bool isDone
 });
 
 
@@ -70,7 +70,7 @@ class _$TodoModelCopyWithImpl<$Res>
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,isDone: null == isDone ? _self.isDone : isDone // ignore: cast_nullable_to_non_nullable
+as TodoTitle,isDone: null == isDone ? _self.isDone : isDone // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -86,7 +86,7 @@ class _TodoModel implements TodoModel {
   factory _TodoModel.fromJson(Map<String, dynamic> json) => _$TodoModelFromJson(json);
 
 @override final  String id;
-@override final  String title;
+@override final  TodoTitle title;
 @override final  bool isDone;
 
 /// Create a copy of TodoModel
@@ -122,7 +122,7 @@ abstract mixin class _$TodoModelCopyWith<$Res> implements $TodoModelCopyWith<$Re
   factory _$TodoModelCopyWith(_TodoModel value, $Res Function(_TodoModel) _then) = __$TodoModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, bool isDone
+ String id, TodoTitle title, bool isDone
 });
 
 
@@ -143,7 +143,7 @@ class __$TodoModelCopyWithImpl<$Res>
   return _then(_TodoModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,isDone: null == isDone ? _self.isDone : isDone // ignore: cast_nullable_to_non_nullable
+as TodoTitle,isDone: null == isDone ? _self.isDone : isDone // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

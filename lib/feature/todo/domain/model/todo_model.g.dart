@@ -8,7 +8,7 @@ part of 'todo_model.dart';
 
 _TodoModel _$TodoModelFromJson(Map<String, dynamic> json) => _TodoModel(
   id: json['id'] as String,
-  title: json['title'] as String,
+  title: TodoTitle.fromJson(json['title'] as Map<String, dynamic>),
   isDone: json['isDone'] as bool,
 );
 
