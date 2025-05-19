@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/application/todo_usecases.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/model/todo_model.dart';
-import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/value/todo_title.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/todo_providers.dart';
 
 /// Todoの編集時のエラー状態を管理するプロバイダー
@@ -33,8 +32,6 @@ class TodoController extends StateNotifier<AsyncValue<List<TodoModel>>> {
   /// 新しいTodoを追加する
   Future<void> add(String rawTitle) async {
     try {
-      // バリデーションを実行
-      TodoTitle(rawTitle);
       await _usecases.add(rawTitle);
       await load();
     } catch (e, st) {
@@ -51,11 +48,8 @@ class TodoController extends StateNotifier<AsyncValue<List<TodoModel>>> {
     if (list == null) return;
 
     try {
-      // バリデーションを実行
-      final title = TodoTitle(rawTitle);
       final todo = list.firstWhere((e) => e.id == id);
-      final updatedTodo = todo.copyWith(title: title);
-      await _usecases.update(updatedTodo);
+      await _usecases.update(todo, rawTitle);
       await load();
     } catch (e, st) {
       if (e is ArgumentError) {
@@ -72,7 +66,7 @@ class TodoController extends StateNotifier<AsyncValue<List<TodoModel>>> {
 
     try {
       final todo = list.firstWhere((e) => e.id == id);
-      await _usecases.update(todo.copyWith(isDone: !todo.isDone));
+      await _usecases.toggle(todo);
       await load();
     } catch (e, st) {
       state = AsyncValue.error(e, st);

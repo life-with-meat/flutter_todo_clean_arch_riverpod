@@ -24,14 +24,22 @@ class TodoUsecases {
     }
   }
 
-  Future<void> update(TodoModel todo) async {
+  Future<void> update(TodoModel todo, String rawTitle) async {
     try {
-      final title = TodoTitle(todo.title.value);
-
+      final title = TodoTitle(rawTitle);
       final updatedTodo = todo.copyWith(title: title);
       await repository.updateTodo(updatedTodo);
     } catch (e) {
       throw Exception('保存できません: ${e is ArgumentError ? e.message : e}');
+    }
+  }
+
+  Future<void> toggle(TodoModel todo) async {
+    try {
+      final updatedTodo = todo.copyWith(isDone: !todo.isDone);
+      await repository.updateTodo(updatedTodo);
+    } catch (e) {
+      throw Exception('更新できません: ${e is ArgumentError ? e.message : e}');
     }
   }
 
