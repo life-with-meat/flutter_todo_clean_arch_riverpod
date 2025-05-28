@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/value/todo_title.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/presentation/controller/todo_controller.dart';
-import 'package:flutter_todo_clean_arch_riverpod/feature/todo/presentation/widget/todo_dialog.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/presentation/widget/input_dialog.dart';
 
 class TodoPage extends ConsumerWidget {
   const TodoPage({super.key});
@@ -42,13 +43,13 @@ class TodoPage extends ConsumerWidget {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            return TodoDialog(
-                              initialTitle: todo.title.value,
+                            return InputDialog(
+                              initialValue: todo.title.value,
                               dialogTitle: 'タスクを編集',
-                              errorProvider: editErrorProvider,
-                              onSave: (newTitle) {
+                              onSubmit: (newTitle) {
                                 todoPageController.update(todo.id, newTitle);
                               },
+                              validator: TodoTitle.validator.validate,
                             );
                           },
                         );
@@ -79,11 +80,11 @@ class TodoPage extends ConsumerWidget {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return TodoDialog(
-                initialTitle: '',
+              return InputDialog(
+                initialValue: '',
                 dialogTitle: '新しいタスク',
-                errorProvider: editErrorProvider,
-                onSave: (newTitle) {
+                validator: TodoTitle.validator.validate,
+                onSubmit: (newTitle) {
                   todoPageController.add(newTitle);
                 },
               );
