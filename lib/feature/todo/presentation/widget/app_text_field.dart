@@ -20,10 +20,10 @@ class AppTextField extends StatefulWidget {
   });
 
   @override
-  State<AppTextField> createState() => _AppTextFieldState();
+  State<AppTextField> createState() => AppTextFieldState();
 }
 
-class _AppTextFieldState extends State<AppTextField> {
+class AppTextFieldState extends State<AppTextField> {
   late final TextEditingController _controller;
   String _currentValue = '';
   String? _errorText;
@@ -50,6 +50,12 @@ class _AppTextFieldState extends State<AppTextField> {
     if (_errorText == null) {
       widget.onChanged(value);
     }
+  }
+
+  void validateExternally() {
+    setState(() {
+      _errorText = widget.validator?.call(_controller.text);
+    });
   }
 
   @override

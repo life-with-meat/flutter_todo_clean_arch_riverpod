@@ -23,12 +23,23 @@ class InputDialog extends StatefulWidget {
 }
 
 class _InputDialogState extends State<InputDialog> {
+  final _textFieldKey = GlobalKey<AppTextFieldState>();
   String _value = '';
 
   @override
   void initState() {
     super.initState();
     _value = widget.initialValue;
+  }
+
+  void _handleSave() {
+    _textFieldKey.currentState?.validateExternally();
+
+    final error = widget.validator(_value);
+    if (error == null) {
+      widget.onSubmit(_value.trim());
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -39,6 +50,7 @@ class _InputDialogState extends State<InputDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           AppTextField(
+            key: _textFieldKey,
             initialValue: widget.initialValue,
             label: '入力内容',
             validator: widget.validator,
@@ -52,17 +64,7 @@ class _InputDialogState extends State<InputDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('キャンセル'),
         ),
-        TextButton(
-          onPressed: () {
-            final error = widget.validator(_value);
-            if (error == null) {
-              widget.onSubmit(_value.trim());
-              Navigator.of(context).pop();
-            }
-            // エラー表示はAppTextField側で行われるので何もしない
-          },
-          child: const Text('保存'),
-        ),
+        TextButton(onPressed: _handleSave, child: const Text('保存')),
       ],
     );
   }
