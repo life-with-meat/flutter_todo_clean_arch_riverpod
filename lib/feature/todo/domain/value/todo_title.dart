@@ -1,4 +1,5 @@
 import 'package:flutter_todo_clean_arch_riverpod/core/validation/text_field_validator.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/error/todo_error.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 /// Todoのタイトルを表す値オブジェクト
@@ -14,6 +15,7 @@ class TodoTitle {
   static const int minLength = 1;
 
   /// タイトルの値
+  @JsonKey(name: 'value')
   final String value;
 
   /// バリデーションルール
@@ -26,20 +28,20 @@ class TodoTitle {
 
   /// 新しいTodoTitleを作成します。
   ///
-  /// [input]が空の場合は[ArgumentError]をスローします。
-  /// [input]が[maxLength]を超える場合は[ArgumentError]をスローします。
-  /// [input]が[minLength]未満の場合は[ArgumentError]をスローします。
+  /// [value]が空の場合は[TodoError.invalidTitle]をスローします。
+  /// [value]が[maxLength]を超える場合は[TodoError.invalidTitle]をスローします。
+  /// [value]が[minLength]未満の場合は[TodoError.invalidTitle]をスローします。
   ///
   /// 例：
   /// ```dart
   /// final title = TodoTitle("新しいタスク"); // OK
-  /// final emptyTitle = TodoTitle(""); // ArgumentError: 入力してください
-  /// final tooLongTitle = TodoTitle("a" * 51); // ArgumentError: 50文字以内で入力してください
+  /// final emptyTitle = TodoTitle(""); // TodoError.invalidTitle
+  /// final tooLongTitle = TodoTitle("a" * 51); // TodoError.invalidTitle
   /// ```
-  factory TodoTitle(String input) {
-    final error = validator.validate(input);
-    if (error != null) throw ArgumentError(error);
-    return TodoTitle._(input.trim());
+  factory TodoTitle(String value) {
+    final error = validator.validate(value);
+    if (error != null) throw TodoError.invalidTitle();
+    return TodoTitle._(value.trim());
   }
 
   /// JSONからTodoTitleを作成します。
