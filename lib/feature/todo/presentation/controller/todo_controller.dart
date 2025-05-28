@@ -1,85 +1,74 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_todo_clean_arch_riverpod/feature/todo/application/todo_usecases.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/error/todo_error.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/model/todo_model.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/todo_providers.dart';
 
-/// Todoの編集時のエラー状態を管理するプロバイダー
-final editErrorProvider = StateProvider<String?>((ref) => null);
-
 /// Todoの状態を管理するコントローラーのプロバイダー
 final todoControllerProvider =
-    StateNotifierProvider<TodoController, AsyncValue<List<TodoModel>>>((ref) {
-      return TodoController(ref.watch(todoUsecaseProvider));
-    });
+    AsyncNotifierProvider<TodoController, List<TodoModel>>(TodoController.new);
 
 /// Todoの状態を管理するコントローラー
-class TodoController extends StateNotifier<AsyncValue<List<TodoModel>>> {
-  final TodoUsecases _usecases;
+class TodoController extends AsyncNotifier<List<TodoModel>> {
+  @override
+  Future<List<TodoModel>> build() async {
+    final usecases = ref.watch(todoUsecaseProvider);
+    final result = await usecases.fetch();
 
-  TodoController(this._usecases) : super(const AsyncValue.loading());
-
-  /// Todoリストを読み込む
-  Future<void> load() async {
-    state = const AsyncValue.loading();
-    try {
-      final todos = await _usecases.fetch();
-      state = AsyncValue.data(todos);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+    return result.fold((error) => throw error, (todos) => todos);
   }
 
-  /// 新しいTodoを追加する
-  Future<void> add(String rawTitle) async {
-    try {
-      await _usecases.add(rawTitle);
-      await load();
-    } catch (e, st) {
-      if (e is ArgumentError) {
-        rethrow;
-      }
-      state = AsyncValue.error(e, st);
-    }
+  Future<TodoError?> add(String rawTitle) async {
+    final usecases = ref.read(todoUsecaseProvider);
+
+    final result = await usecases.add(rawTitle);
+    return result.fold((error) => error, (_) async {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(() async => await build());
+      return null;
+    });
   }
 
-  /// Todoを更新する
-  Future<void> update(String id, String rawTitle) async {
+  Future<TodoError?> updateTodo(String id, String rawTitle) async {
     final list = state.valueOrNull;
-    if (list == null) return;
+    if (list == null) return null;
 
-    try {
-      final todo = list.firstWhere((e) => e.id == id);
-      await _usecases.update(todo, rawTitle);
-      await load();
-    } catch (e, st) {
-      if (e is ArgumentError) {
-        rethrow;
-      }
-      state = AsyncValue.error(e, st);
-    }
+    final todo = list.firstWhere((e) => e.id == id);
+
+    final usecases = ref.read(todoUsecaseProvider);
+
+    final result = await usecases.update(todo, rawTitle);
+
+    return result.fold((error) => error, (_) async {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(() async => await build());
+      return null;
+    });
   }
 
-  /// Todoの完了状態を切り替える
-  Future<void> toggle(String id) async {
+  Future<TodoError?> toggle(String id) async {
     final list = state.valueOrNull;
-    if (list == null) return;
+    if (list == null) return null;
 
-    try {
-      final todo = list.firstWhere((e) => e.id == id);
-      await _usecases.toggle(todo);
-      await load();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+    final todo = list.firstWhere((e) => e.id == id);
+
+    final usecases = ref.read(todoUsecaseProvider);
+
+    final result = await usecases.toggle(todo);
+    return result.fold((error) => error, (_) async {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(() async => await build());
+      return null;
+    });
   }
 
-  /// Todoを削除する
-  Future<void> remove(String id) async {
-    try {
-      await _usecases.delete(id);
-      await load();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+  Future<TodoError?> remove(String id) async {
+    final usecases = ref.read(todoUsecaseProvider);
+
+    final result = await usecases.delete(id);
+    return result.fold((error) => error, (_) async {
+      state = const AsyncLoading();
+      state = await AsyncValue.guard(() async => await build());
+      return null;
+    });
   }
 }
