@@ -1,11 +1,14 @@
 import 'package:flutter_todo_clean_arch_riverpod/core/validation/text_field_validator.dart';
+import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/error/todo_error.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+part 'todo_title.g.dart';
 
 /// Todoのタイトルを表す値オブジェクト
 ///
 /// タイトルは1文字以上50文字以下である必要があります。
 /// 空文字列は許可されません。
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class TodoTitle {
   /// タイトルの最大文字数
   static const int maxLength = 50;
@@ -14,6 +17,7 @@ class TodoTitle {
   static const int minLength = 1;
 
   /// タイトルの値
+  @JsonKey(name: 'value')
   final String value;
 
   /// バリデーションルール
@@ -26,28 +30,34 @@ class TodoTitle {
 
   /// 新しいTodoTitleを作成します。
   ///
-  /// [input]が空の場合は[ArgumentError]をスローします。
-  /// [input]が[maxLength]を超える場合は[ArgumentError]をスローします。
-  /// [input]が[minLength]未満の場合は[ArgumentError]をスローします。
+  /// [value]が空の場合は[TodoError.invalidTitle]をスローします。
+  /// [value]が[maxLength]を超える場合は[TodoError.invalidTitle]をスローします。
+  /// [value]が[minLength]未満の場合は[TodoError.invalidTitle]をスローします。
   ///
   /// 例：
   /// ```dart
   /// final title = TodoTitle("新しいタスク"); // OK
-  /// final emptyTitle = TodoTitle(""); // ArgumentError: 入力してください
-  /// final tooLongTitle = TodoTitle("a" * 51); // ArgumentError: 50文字以内で入力してください
+  /// final emptyTitle = TodoTitle(""); // TodoError.invalidTitle
+  /// final tooLongTitle = TodoTitle("a" * 51); // TodoError.invalidTitle
   /// ```
-  factory TodoTitle(String input) {
-    final error = validator.validate(input);
-    if (error != null) throw ArgumentError(error);
-    return TodoTitle._(input.trim());
+  factory TodoTitle(String value) {
+    final error = validator.validate(value);
+    if (error != null) throw TodoError.invalidTitle();
+    return TodoTitle._(value.trim());
   }
 
   /// JSONからTodoTitleを作成します。
   ///
   /// [json]は'value'キーを持つMapである必要があります。
   /// 値は文字列である必要があります。
-  factory TodoTitle.fromJson(Map<String, dynamic> json) =>
-      TodoTitle(json['value'] as String);
+  factory TodoTitle.fromJson(Map<String, dynamic> json) {
+    final value = json['value'] as String? ?? '';
+    try {
+      return TodoTitle(value);
+    } catch (_) {
+      throw TodoError.invalidTitle(); // より具体的に
+    }
+  }
 
   /// TodoTitleをJSONに変換します。
   ///

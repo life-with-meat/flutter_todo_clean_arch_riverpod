@@ -1,44 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_todo_clean_arch_riverpod/core/validation/text_field_validator.dart';
 
-/// バリデーション機能付きのテキストフィールド
-class AppTextField extends ConsumerStatefulWidget {
-  /// 初期値
+/// 汎用バリデーション対応のテキストフィールド
+class AppTextField extends StatefulWidget {
   final String initialValue;
-
-  /// ラベルテキスト
   final String label;
-
-  /// エラー状態を管理するプロバイダー
-  final StateProvider<String?> errorProvider;
-
-  /// 値が変更された時のコールバック
   final ValueChanged<String> onChanged;
-
-  /// バリデーター
-  final TextFieldValidator validator;
-
-  /// 文字数カウンターを表示するかどうか
+  final String? Function(String)? validator;
   final bool showCounter;
+  final int? maxLength;
 
   const AppTextField({
     super.key,
     required this.initialValue,
     required this.label,
-    required this.errorProvider,
     required this.onChanged,
-    required this.validator,
+    this.validator,
     this.showCounter = true,
+    this.maxLength,
   });
 
   @override
-  ConsumerState<AppTextField> createState() => _AppTextFieldState();
+  State<AppTextField> createState() => AppTextFieldState();
 }
 
-class _AppTextFieldState extends ConsumerState<AppTextField> {
+class AppTextFieldState extends State<AppTextField> {
   late final TextEditingController _controller;
   String _currentValue = '';
+  String? _errorText;
 
   @override
   void initState() {
@@ -56,37 +44,40 @@ class _AppTextFieldState extends ConsumerState<AppTextField> {
   void _validateAndUpdate(String value) {
     setState(() {
       _currentValue = value;
+      _errorText = widget.validator?.call(value);
     });
 
-    final error = widget.validator.validate(value);
-    ref.read(widget.errorProvider.notifier).state = error;
-
-    if (error == null) {
+    if (_errorText == null) {
       widget.onChanged(value);
     }
   }
 
+  void validateExternally() {
+    setState(() {
+      _errorText = widget.validator?.call(_controller.text);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final showCounter = widget.showCounter;
-    final maxLength = widget.validator.maxLength;
     final currentLength = _currentValue.length;
-    final isOverMaxLength = maxLength != null && currentLength > maxLength;
-    final errorText = ref.watch(widget.errorProvider);
-    final showLengthCounter = showCounter && maxLength != null;
+    final isOverMax =
+        widget.maxLength != null && currentLength > widget.maxLength!;
+    final showLengthCounter = widget.showCounter && widget.maxLength != null;
 
     return TextField(
       controller: _controller,
       decoration: InputDecoration(
         labelText: widget.label,
-        errorText: errorText,
-        helperText: showLengthCounter ? '$currentLength/$maxLength' : null,
-        helperStyle: TextStyle(color: isOverMaxLength ? Colors.red : null),
+        errorText: _errorText,
+        helperText:
+            showLengthCounter ? '$currentLength/${widget.maxLength}' : null,
+        helperStyle: TextStyle(color: isOverMax ? Colors.red : null),
       ),
       onChanged: _validateAndUpdate,
-      maxLength: maxLength,
+      maxLength: widget.maxLength,
       buildCounter:
-          showCounter
+          widget.showCounter
               ? null
               : (
                 BuildContext context, {
