@@ -2,11 +2,13 @@ import 'package:flutter_todo_clean_arch_riverpod/core/validation/text_field_vali
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/error/todo_error.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+part 'todo_title.g.dart';
+
 /// Todoのタイトルを表す値オブジェクト
 ///
 /// タイトルは1文字以上50文字以下である必要があります。
 /// 空文字列は許可されません。
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class TodoTitle {
   /// タイトルの最大文字数
   static const int maxLength = 50;
@@ -48,8 +50,14 @@ class TodoTitle {
   ///
   /// [json]は'value'キーを持つMapである必要があります。
   /// 値は文字列である必要があります。
-  factory TodoTitle.fromJson(Map<String, dynamic> json) =>
-      TodoTitle(json['value'] as String);
+  factory TodoTitle.fromJson(Map<String, dynamic> json) {
+    final value = json['value'] as String? ?? '';
+    try {
+      return TodoTitle(value);
+    } catch (_) {
+      throw TodoError.invalidTitle(); // より具体的に
+    }
+  }
 
   /// TodoTitleをJSONに変換します。
   ///

@@ -6,8 +6,9 @@ part 'todo_model.g.dart';
 
 @freezed
 abstract class TodoModel with _$TodoModel {
-  factory TodoModel({
+  const factory TodoModel({
     required String id,
+    @JsonKey(toJson: _titleToJson, fromJson: _titleFromJson)
     required TodoTitle title,
     required bool isDone,
   }) = _TodoModel;
@@ -15,3 +16,7 @@ abstract class TodoModel with _$TodoModel {
   factory TodoModel.fromJson(Map<String, dynamic> json) =>
       _$TodoModelFromJson(json);
 }
+
+// TodoTitleのJSON変換用のヘルパー関数
+Map<String, dynamic> _titleToJson(TodoTitle title) => title.toJson();
+TodoTitle _titleFromJson(Map<String, dynamic> json) => TodoTitle.fromJson(json);

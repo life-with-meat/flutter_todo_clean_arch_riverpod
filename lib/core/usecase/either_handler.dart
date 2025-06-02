@@ -1,3 +1,4 @@
+import 'package:flutter_todo_clean_arch_riverpod/core/logger/app_logger.dart';
 import 'package:fpdart/fpdart.dart';
 
 /// 共通の例外 → Either 変換処理
@@ -8,7 +9,8 @@ Future<Either<E, T>> toEither<E, T>({
   try {
     final result = await action();
     return right(result);
-  } catch (error) {
+  } catch (error, stackTrace) {
+    AppLogger.error('エラーが発生しました', error, stackTrace);
     if (onError != null) {
       return left(onError(error));
     } else if (error is E) {

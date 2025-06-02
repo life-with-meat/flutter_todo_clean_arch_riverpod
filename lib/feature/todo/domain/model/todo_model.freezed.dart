@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TodoModel {
 
- String get id; TodoTitle get title; bool get isDone;
+ String get id;@JsonKey(toJson: _titleToJson, fromJson: _titleFromJson) TodoTitle get title; bool get isDone;
 /// Create a copy of TodoModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $TodoModelCopyWith<$Res>  {
   factory $TodoModelCopyWith(TodoModel value, $Res Function(TodoModel) _then) = _$TodoModelCopyWithImpl;
 @useResult
 $Res call({
- String id, TodoTitle title, bool isDone
+ String id,@JsonKey(toJson: _titleToJson, fromJson: _titleFromJson) TodoTitle title, bool isDone
 });
 
 
@@ -82,11 +82,11 @@ as bool,
 @JsonSerializable()
 
 class _TodoModel implements TodoModel {
-   _TodoModel({required this.id, required this.title, required this.isDone});
+  const _TodoModel({required this.id, @JsonKey(toJson: _titleToJson, fromJson: _titleFromJson) required this.title, required this.isDone});
   factory _TodoModel.fromJson(Map<String, dynamic> json) => _$TodoModelFromJson(json);
 
 @override final  String id;
-@override final  TodoTitle title;
+@override@JsonKey(toJson: _titleToJson, fromJson: _titleFromJson) final  TodoTitle title;
 @override final  bool isDone;
 
 /// Create a copy of TodoModel
@@ -122,7 +122,7 @@ abstract mixin class _$TodoModelCopyWith<$Res> implements $TodoModelCopyWith<$Re
   factory _$TodoModelCopyWith(_TodoModel value, $Res Function(_TodoModel) _then) = __$TodoModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, TodoTitle title, bool isDone
+ String id,@JsonKey(toJson: _titleToJson, fromJson: _titleFromJson) TodoTitle title, bool isDone
 });
 
 

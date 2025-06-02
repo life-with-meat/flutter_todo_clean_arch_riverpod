@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_todo_clean_arch_riverpod/core/error/common_error.dart';
+import 'package:flutter_todo_clean_arch_riverpod/core/logger/app_logger.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/error/todo_error.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/model/todo_model.dart';
 import 'package:flutter_todo_clean_arch_riverpod/feature/todo/domain/todo_repository.dart';
@@ -14,9 +15,13 @@ class TodoRepositoryImpl implements TodoRepository {
   Future<T> _handleError<T>(Future<T> Function() operation) async {
     try {
       return await operation();
-    } on FirebaseException catch (_) {
-      throw TodoError.common(CommonError.networkError());
-    } catch (_) {
+    } on FirebaseException catch (error, stackTrace) {
+      AppLogger.error('Firebaseエラーが発生しました', error, stackTrace);
+      throw TodoError.common(
+        CommonError.firebaseError(error.code, error.message ?? '不明なエラー'),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error('予期せぬエラーが発生しました', error, stackTrace);
       throw TodoError.common(CommonError.unexpectedError());
     }
   }

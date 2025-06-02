@@ -11,6 +11,8 @@ abstract class CommonError with _$CommonError {
   const factory CommonError.cacheError() = CacheError;
   const factory CommonError.invalidInputError() = InvalidInputError;
   const factory CommonError.timeoutError() = TimeoutError;
+  const factory CommonError.firebaseError(String code, String message) =
+      FirebaseError;
 
   String get message {
     return switch (this) {
@@ -19,6 +21,8 @@ abstract class CommonError with _$CommonError {
       CacheError() => 'キャッシュエラーが発生しました',
       InvalidInputError() => '無効な入力です',
       TimeoutError() => 'タイムアウトが発生しました',
+      FirebaseError(code: final code, message: final message) =>
+        'Firebaseエラー: $code - $message',
       _ => throw UnimplementedError(),
     };
   }

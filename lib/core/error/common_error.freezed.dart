@@ -202,4 +202,72 @@ String toString() {
 
 
 
+/// @nodoc
+
+
+class FirebaseError extends CommonError {
+  const FirebaseError(this.code, this.message): super._();
+  
+
+ final  String code;
+ final  String message;
+
+/// Create a copy of CommonError
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FirebaseErrorCopyWith<FirebaseError> get copyWith => _$FirebaseErrorCopyWithImpl<FirebaseError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FirebaseError&&(identical(other.code, code) || other.code == code)&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,code,message);
+
+@override
+String toString() {
+  return 'CommonError.firebaseError(code: $code, message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FirebaseErrorCopyWith<$Res> implements $CommonErrorCopyWith<$Res> {
+  factory $FirebaseErrorCopyWith(FirebaseError value, $Res Function(FirebaseError) _then) = _$FirebaseErrorCopyWithImpl;
+@useResult
+$Res call({
+ String code, String message
+});
+
+
+
+
+}
+/// @nodoc
+class _$FirebaseErrorCopyWithImpl<$Res>
+    implements $FirebaseErrorCopyWith<$Res> {
+  _$FirebaseErrorCopyWithImpl(this._self, this._then);
+
+  final FirebaseError _self;
+  final $Res Function(FirebaseError) _then;
+
+/// Create a copy of CommonError
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? code = null,Object? message = null,}) {
+  return _then(FirebaseError(
+null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 // dart format on
